@@ -1,5 +1,5 @@
 locals {
-  name            = try(var.helm_config.name, "external-dns")
+  name            = try(var.helm_config.name, "external-dns-internal")
   service_account = try(var.helm_config.service_account, "${local.name}-sa")
 
   argocd_gitops_config = merge(
@@ -19,9 +19,9 @@ module "helm_addon" {
     {
       description = "ExternalDNS Helm Chart"
       name        = local.name
-      chart       = local.name
+      chart       = "external-dns"
       repository  = "https://charts.bitnami.com/bitnami"
-      version     = "6.11.2"
+      version     = "6.13.2"
       namespace   = local.name
       values = [
         <<-EOT
@@ -34,27 +34,15 @@ module "helm_addon" {
     var.helm_config
   )
 
-  set_values = concat(
-    [
-      {
-        name  = "serviceAccount.name"
-        value = local.service_account
-      },
-      {
-        name  = "serviceAccount.create"
-        value = false
-      }
-    ],
-    try(var.helm_config.set_values, [])
-  )
+  set_values = try(var.helm_config.set_values, [])
 
   irsa_config = {
-    create_kubernetes_namespace         = try(var.helm_config.create_namespace, true)
+    create_kubernetes_namespace         = try(var.helm_config.create_namespace, false)
     kubernetes_namespace                = try(var.helm_config.namespace, local.name)
-    create_kubernetes_service_account   = true
+    create_kubernetes_service_account   = try(var.helm_config["create_kubernetes_service_account"], false)
     create_service_account_secret_token = try(var.helm_config["create_service_account_secret_token"], false)
     kubernetes_service_account          = local.service_account
-    irsa_iam_policies                   = concat([aws_iam_policy.external_dns.arn], var.irsa_policies)
+    irsa_iam_policies                   = try(var.helm_config["irsa_iam_policies"], null)
   }
 
   addon_context     = var.addon_context
@@ -65,16 +53,11 @@ module "helm_addon" {
 # IAM Policy
 #------------------------------------
 
-resource "aws_iam_policy" "external_dns" {
-  description = "External DNS IAM policy."
+resource "aws_iam_policy" "external_dns_internal" {
+  count       = var.create_irsa ? 1: 0 
+  description = "External DNS Internal IAM policy."
   name        = "${var.addon_context.eks_cluster_id}-${local.name}-irsa"
   path        = var.addon_context.irsa_iam_role_path
-  policy      = data.aws_iam_policy_document.external_dns_iam_policy_document.json
+  policy      = data.aws_iam_policy_document.external_dns_internal_iam_policy_document.json
   tags        = var.addon_context.tags
-}
-
-# TODO - remove at next breaking change
-data "aws_route53_zone" "selected" {
-  name         = var.domain_name
-  private_zone = var.private_zone
 }

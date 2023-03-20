@@ -340,35 +340,48 @@ variable "ondat_admin_password" {
   sensitive   = true
 }
 
-#-----------External DNS ADDON-------------
-variable "enable_external_dns" {
+#-----------External DNS Internal ADDON-------------
+variable "enable_external_dns_internal" {
   description = "External DNS add-on"
   type        = bool
   default     = false
 }
 
-variable "external_dns_helm_config" {
+variable "external_dns_internal_helm_config" {
   description = "External DNS Helm Chart config"
   type        = any
   default     = {}
 }
 
-variable "external_dns_irsa_policies" {
+variable "external_dns_internal_irsa_policies" {
   description = "Additional IAM policies for a IAM role for service accounts"
   type        = list(string)
   default     = []
 }
 
-variable "external_dns_private_zone" {
+variable "external_dns_internal_private_zone" {
   type        = bool
   description = "Determines if referenced Route53 zone is private."
   default     = false
 }
 
-variable "external_dns_route53_zone_arns" {
+variable "external_dns_internal_route53_zone_arns" {
   description = "List of Route53 zones ARNs which external-dns will have access to create/manage records"
   type        = list(string)
   default     = []
+}
+
+#-----------External DNS External ADDON-------------
+variable "enable_external_dns_external" {
+  description = "External DNS add-on"
+  type        = bool
+  default     = false
+}
+
+variable "external_dns_external_helm_config" {
+  description = "External DNS Helm Chart config"
+  type        = any
+  default     = {}
 }
 
 #-----------Amazon Managed Service for Prometheus-------------
@@ -1238,6 +1251,19 @@ variable "airflow_helm_config" {
   default     = {}
 }
 
+#-----------Apache Airflow Test ADDON-------------
+variable "enable_airflow_test" {
+  description = "Enable Airflow Test add-on"
+  type        = bool
+  default     = false
+}
+
+variable "airflow_test_helm_config" {
+  description = "Apache Airflow Test v2 Helm Chart config"
+  type        = any
+  default     = {}
+}
+
 #-----Apache Kafka Strimzi Operator------
 variable "enable_strimzi_kafka_operator" {
   description = "Enable Kafka add-on"
@@ -1260,6 +1286,45 @@ variable "enable_datadog_operator" {
 
 variable "datadog_operator_helm_config" {
   description = "Datadog Operator Helm Chart config"
+  type        = any
+  default     = {}
+}
+
+#-----------Datadog -------------
+variable "enable_datadog" {
+  description = "Enable Datadog add-on"
+  type        = bool
+  default     = false
+}
+
+variable "datadog_helm_config" {
+  description = "Datadog Helm Chart config"
+  type        = any
+  default     = {}
+}
+
+#-----------Memcached -------------
+variable "enable_memcached" {
+  description = "Enable Memcached add-on"
+  type        = bool
+  default     = false
+}
+
+variable "memcached_helm_config" {
+  description = "Memcached Helm Chart config"
+  type        = any
+  default     = {}
+}
+
+#-----------ECK Operator -------------
+variable "enable_eck_operator" {
+  description = "Enable ECK Operator add-on"
+  type        = bool
+  default     = false
+}
+
+variable "eck_operator_helm_config" {
+  description = "ECK Operator Helm Chart config"
   type        = any
   default     = {}
 }

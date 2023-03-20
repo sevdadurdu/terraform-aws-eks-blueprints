@@ -28,6 +28,11 @@ output "airflow" {
   value       = try(module.airflow[0], null)
 }
 
+output "airflow_test" {
+  description = "Map of attributes of the Helm release and IRSA created"
+  value       = try(module.airflow_test[0], null)
+}
+
 output "appmesh_controller" {
   description = "Map of attributes of the Helm release and IRSA created"
   value       = try(module.appmesh_controller[0], null)
@@ -158,9 +163,29 @@ output "datadog_operator" {
   value       = try(module.datadog_operator[0], null)
 }
 
-output "external_dns" {
+output "datadog" {
   description = "Map of attributes of the Helm release and IRSA created"
-  value       = try(module.external_dns[0], null)
+  value       = try(module.datadog[0], null)
+}
+
+output "memcached" {
+  description = "Map of attributes of the Helm release and IRSA created"
+  value       = try(module.memcached[0], null)
+}
+
+output "eck_operator" {
+  description = "Map of attributes of the Helm release and IRSA created"
+  value       = try(module.eck_operator[0], null)
+}
+
+output "external_dns_internal" {
+  description = "Map of attributes of the Helm release and IRSA created"
+  value       = try(module.external_dns_internal[0], null)
+}
+
+output "external_dns_external" {
+  description = "Map of attributes of the Helm release and IRSA created"
+  value       = try(module.external_dns_external[0], null)
 }
 
 output "external_secrets" {

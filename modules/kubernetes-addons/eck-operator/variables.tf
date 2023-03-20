@@ -1,18 +1,7 @@
-variable "eks_cluster_version" {
-  description = "The Kubernetes version for the cluster - used to match appropriate version for image used"
-  type        = string
-}
-
 variable "helm_config" {
-  description = "Cluster Autoscaler Helm Config"
+  description = "Helm Config for calico"
   type        = any
   default     = {}
-}
-
-variable "create_irsa" {
-  description = "Cluster Autoscaler Irsa"
-  type        = bool
-  default     = false
 }
 
 variable "manage_via_gitops" {
@@ -33,7 +22,5 @@ variable "addon_context" {
     eks_oidc_issuer_url            = string
     eks_oidc_provider_arn          = string
     tags                           = map(string)
-    irsa_iam_role_path             = optional(string)
-    irsa_iam_permissions_boundary  = optional(string)
   })
 }

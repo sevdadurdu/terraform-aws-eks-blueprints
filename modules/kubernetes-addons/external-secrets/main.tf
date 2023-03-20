@@ -8,6 +8,7 @@ module "helm_addon" {
 }
 
 resource "aws_iam_policy" "external_secrets" {
+  count       = var.create_irsa ? 1 : 0
   name        = "${var.addon_context.eks_cluster_id}-${local.helm_config["name"]}-irsa"
   path        = var.addon_context.irsa_iam_role_path
   description = "Provides permissions to for External Secrets to retrieve secrets from AWS SSM and AWS Secrets Manager"

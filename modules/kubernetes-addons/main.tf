@@ -112,6 +112,13 @@ module "airflow" {
   addon_context = local.addon_context
 }
 
+module "airflow_test" {
+  count         = var.enable_airflow_test ? 1 : 0
+  source        = "./airflow-test"
+  helm_config   = var.airflow_test_helm_config
+  addon_context = local.addon_context
+}
+
 module "argocd" {
   count         = var.enable_argocd ? 1 : 0
   source        = "./argocd"
@@ -273,19 +280,59 @@ module "datadog_operator" {
   addon_context     = local.addon_context
 }
 
-module "external_dns" {
-  source = "./external-dns"
+module "datadog" {
+  source = "./datadog"
 
-  count = var.enable_external_dns ? 1 : 0
+  count = var.enable_datadog ? 1 : 0
 
-  helm_config       = var.external_dns_helm_config
+  helm_config       = var.datadog_helm_config
   manage_via_gitops = var.argocd_manage_add_ons
-  irsa_policies     = var.external_dns_irsa_policies
+  addon_context     = local.addon_context
+}
+
+module "memcached" {
+  source = "./memcached"
+
+  count = var.enable_memcached ? 1 : 0
+
+  helm_config       = var.memcached_helm_config
+  manage_via_gitops = var.argocd_manage_add_ons
+  addon_context     = local.addon_context
+}
+
+module "eck_operator" {
+  source = "./eck-operator"
+
+  count = var.enable_eck_operator ? 1 : 0
+
+  helm_config       = var.eck_operator_helm_config
+  manage_via_gitops = var.argocd_manage_add_ons
+  addon_context     = local.addon_context
+}
+
+module "external_dns_internal" {
+  source = "./external-dns-internal"
+
+  count = var.enable_external_dns_internal ? 1 : 0
+
+  helm_config       = var.external_dns_internal_helm_config
+  manage_via_gitops = var.argocd_manage_add_ons
+  irsa_policies     = var.external_dns_internal_irsa_policies
   addon_context     = local.addon_context
 
   domain_name       = var.eks_cluster_domain
-  private_zone      = var.external_dns_private_zone
-  route53_zone_arns = var.external_dns_route53_zone_arns
+  private_zone      = var.external_dns_internal_private_zone
+  route53_zone_arns = var.external_dns_internal_route53_zone_arns
+}
+
+module "external_dns_external" {
+  source = "./external-dns-external"
+
+  count = var.enable_external_dns_external ? 1 : 0
+
+  helm_config       = var.external_dns_external_helm_config
+  manage_via_gitops = var.argocd_manage_add_ons
+  addon_context     = local.addon_context
 }
 
 module "fargate_fluentbit" {

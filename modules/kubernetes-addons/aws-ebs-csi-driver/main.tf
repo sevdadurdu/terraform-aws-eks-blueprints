@@ -1,7 +1,7 @@
 locals {
   name = "aws-ebs-csi-driver"
 
-  create_irsa     = try(var.addon_config.service_account_role_arn == "", true)
+  create_irsa     = try(var.addon_config.service_account_role_arn == "", false)
   namespace       = try(var.helm_config.namespace, "kube-system")
   service_account = try(var.helm_config.service_account, "ebs-csi-controller-sa")
 }
@@ -38,7 +38,7 @@ module "helm_addon" {
     name        = local.name
     description = "The Amazon Elastic Block Store Container Storage Interface (CSI) Driver provides a CSI interface used by Container Orchestrators to manage the lifecycle of Amazon EBS volumes."
     chart       = local.name
-    version     = "2.12.1"
+    version     = "2.13.0"
     repository  = "https://kubernetes-sigs.github.io/aws-ebs-csi-driver"
     namespace   = local.namespace
     values = [
@@ -54,20 +54,15 @@ module "helm_addon" {
     var.helm_config
   )
 
-  set_values = [
-    {
-      name  = "controller.serviceAccount.create"
-      value = "false"
-    }
-  ]
+  set_values = try(var.helm_config.set_values, [])
 
   irsa_config = {
     create_kubernetes_namespace         = try(var.helm_config.create_namespace, false)
     kubernetes_namespace                = local.namespace
-    create_kubernetes_service_account   = true
+    create_kubernetes_service_account   = try(var.helm_config["create_kubernetes_service_account"], false)
     create_service_account_secret_token = try(var.helm_config["create_service_account_secret_token"], false)
     kubernetes_service_account          = local.service_account
-    irsa_iam_policies                   = concat([aws_iam_policy.aws_ebs_csi_driver[0].arn], lookup(var.helm_config, "additional_iam_policies", []))
+    irsa_iam_policies                   = try(var.helm_config["irsa_iam_policies"], null)
   }
 
   # Blueprints
@@ -83,7 +78,7 @@ module "irsa_addon" {
   create_kubernetes_service_account = false
   kubernetes_namespace              = local.namespace
   kubernetes_service_account        = local.service_account
-  irsa_iam_policies                 = concat([aws_iam_policy.aws_ebs_csi_driver[0].arn], lookup(var.addon_config, "additional_iam_policies", []))
+  irsa_iam_policies                 = try(var.helm_config["irsa_iam_policies"], null)
   irsa_iam_role_path                = var.addon_context.irsa_iam_role_path
   irsa_iam_permissions_boundary     = var.addon_context.irsa_iam_permissions_boundary
   eks_cluster_id                    = var.addon_context.eks_cluster_id
@@ -91,7 +86,7 @@ module "irsa_addon" {
 }
 
 resource "aws_iam_policy" "aws_ebs_csi_driver" {
-  count = local.create_irsa || var.enable_self_managed_aws_ebs_csi_driver ? 1 : 0
+  count = local.create_irsa && var.enable_self_managed_aws_ebs_csi_driver ? 1 : 0
 
   name        = "${var.addon_context.eks_cluster_id}-aws-ebs-csi-driver-irsa"
   description = "IAM Policy for AWS EBS CSI Driver"

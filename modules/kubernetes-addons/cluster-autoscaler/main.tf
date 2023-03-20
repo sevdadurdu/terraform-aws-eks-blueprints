@@ -26,30 +26,23 @@ module "helm_addon" {
     var.helm_config
   )
 
-  set_values = [
-    {
-      name  = "rbac.serviceAccount.create"
-      value = "false"
-    },
-    {
-      name  = "rbac.serviceAccount.name"
-      value = local.service_account
-    }
-  ]
+  set_values = try(var.helm_config.set_values, [])
+
 
   irsa_config = {
     create_kubernetes_namespace         = try(var.helm_config.create_namespace, false)
     kubernetes_namespace                = local.namespace
-    create_kubernetes_service_account   = true
+    create_kubernetes_service_account   = try(var.helm_config.create_service_account, false)
     create_service_account_secret_token = try(var.helm_config["create_service_account_secret_token"], false)
     kubernetes_service_account          = local.service_account
-    irsa_iam_policies                   = [aws_iam_policy.cluster_autoscaler.arn]
+    irsa_iam_policies                   = try(var.helm_config["irsa_iam_policies"], null)
   }
 
   addon_context = var.addon_context
 }
 
 resource "aws_iam_policy" "cluster_autoscaler" {
+  count       = var.create_irsa ? 1: 0 
   name        = "${var.addon_context.eks_cluster_id}-${local.name}-irsa"
   description = "Cluster Autoscaler IAM policy"
   policy      = data.aws_iam_policy_document.cluster_autoscaler.json

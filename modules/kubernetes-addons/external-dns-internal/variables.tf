@@ -16,6 +16,12 @@ variable "irsa_policies" {
   default     = []
 }
 
+variable "create_irsa" {
+  description = "Cluster Autoscaler Irsa"
+  type        = bool
+  default     = false
+}
+
 variable "domain_name" {
   description = "[Deprecated - use `route53_zone_arns`] Domain name of the Route53 hosted zone to use with External DNS."
   type        = string

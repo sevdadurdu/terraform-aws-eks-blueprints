@@ -4,10 +4,9 @@ locals {
     name             = local.name
     chart            = "strimzi-kafka-operator"
     repository       = "https://strimzi.io/charts/"
-    version          = "0.31.1"
+    version          = "0.32.0"
     namespace        = local.name
     create_namespace = true
-    values           = [templatefile("${path.module}/values.yaml", {})]
     description      = "Strimzi - Apache Kafka on Kubernetes"
   }
   helm_config = merge(local.default_helm_config, var.helm_config)

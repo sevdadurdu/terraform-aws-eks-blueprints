@@ -7,7 +7,7 @@ locals {
     name        = local.name
     chart       = local.name
     repository  = "https://aws.github.io/eks-charts"
-    version     = "1.4.5"
+    version     = "1.4.6"
     namespace   = "kube-system"
     values      = local.default_helm_values
     description = "aws-load-balancer-controller Helm Chart for ingress resources"
@@ -24,19 +24,7 @@ locals {
     repository     = "${var.addon_context.default_repository}/amazon/aws-load-balancer-controller"
   })]
 
-  set_values = concat(
-    [
-      {
-        name  = "serviceAccount.name"
-        value = local.service_account
-      },
-      {
-        name  = "serviceAccount.create"
-        value = false
-      }
-    ],
-    try(var.helm_config.set_values, [])
-  )
+  set_values =  try(var.helm_config.set_values, [])
 
   argocd_gitops_config = {
     enable             = true
@@ -47,8 +35,8 @@ locals {
     kubernetes_namespace                = local.helm_config["namespace"]
     kubernetes_service_account          = local.service_account
     create_kubernetes_namespace         = try(local.helm_config["create_namespace"], true)
-    create_kubernetes_service_account   = true
+    create_kubernetes_service_account   = try(local.helm_config["create_kubernetes_service_account"], false)
     create_service_account_secret_token = try(local.helm_config["create_service_account_secret_token"], false)
-    irsa_iam_policies                   = [aws_iam_policy.aws_load_balancer_controller.arn]
+    irsa_iam_policies                   = try(var.helm_config["irsa_iam_policies"], null)
   }
 }

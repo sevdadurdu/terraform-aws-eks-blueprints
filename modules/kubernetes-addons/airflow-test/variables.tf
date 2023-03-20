@@ -1,23 +1,11 @@
 variable "helm_config" {
-  description = "Helm provider config for the aws_load_balancer_controller."
+  description = "Helm provider config for the airflow."
   type        = any
   default     = {}
 }
 
-variable "manage_via_gitops" {
-  description = "Determines if the add-on should be managed via GitOps."
-  type        = bool
-  default     = false
-}
-
-variable "create_irsa" {
-  description = "Cluster Autoscaler Irsa"
-  type        = bool
-  default     = false
-}
-
 variable "addon_context" {
-  description = "Input configuration for the addon."
+  description = "Input configuration for the addon"
   type = object({
     aws_caller_identity_account_id = string
     aws_caller_identity_arn        = string
@@ -30,6 +18,5 @@ variable "addon_context" {
     tags                           = map(string)
     irsa_iam_role_path             = string
     irsa_iam_permissions_boundary  = string
-    default_repository             = string
   })
 }

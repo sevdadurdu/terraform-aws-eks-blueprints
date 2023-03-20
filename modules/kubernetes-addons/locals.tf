@@ -16,6 +16,9 @@ locals {
     clusterAutoscaler         = var.enable_cluster_autoscaler ? module.cluster_autoscaler[0].argocd_gitops_config : null
     corednsAutoscaler         = var.enable_amazon_eks_coredns && var.enable_coredns_autoscaler && length(var.coredns_autoscaler_helm_config) > 0 ? module.coredns_autoscaler[0].argocd_gitops_config : null
     datadogOperator           = var.enable_datadog_operator ? module.datadog_operator[0].argocd_gitops_config : null
+    datadog                   = var.enable_datadog ? module.datadog[0].argocd_gitops_config : null
+    memcached                 = var.enable_memcached ? module.memcached[0].argocd_gitops_config : null
+    eck-operator              = var.enable_eck_operator ? module.eck_operator[0].argocd_gitops_config : null
     grafana                   = var.enable_grafana ? module.grafana[0].argocd_gitops_config : null
     ingressNginx              = var.enable_ingress_nginx ? module.ingress_nginx[0].argocd_gitops_config : null
     keda                      = var.enable_keda ? module.keda[0].argocd_gitops_config : null
@@ -35,7 +38,8 @@ locals {
     kubernetesDashboard       = var.enable_kubernetes_dashboard ? module.kubernetes_dashboard[0].argocd_gitops_config : null
     kubePrometheusStack       = var.enable_kube_prometheus_stack ? module.kube_prometheus_stack[0].argocd_gitops_config : null
     awsCloudWatchMetrics      = var.enable_aws_cloudwatch_metrics ? module.aws_cloudwatch_metrics[0].argocd_gitops_config : null
-    externalDns               = var.enable_external_dns ? module.external_dns[0].argocd_gitops_config : null
+    externalDnsInternal       = var.enable_external_dns_internal ? module.external_dns_internal[0].argocd_gitops_config : null
+    externalDnsExternal       = var.enable_external_dns_external ? module.external_dns_external[0].argocd_gitops_config : null
     externalSecrets           = var.enable_external_secrets ? module.external_secrets[0].argocd_gitops_config : null
     velero                    = var.enable_velero ? module.velero[0].argocd_gitops_config : null
     promtail                  = var.enable_promtail ? module.promtail[0].argocd_gitops_config : null

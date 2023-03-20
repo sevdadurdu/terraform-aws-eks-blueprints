@@ -16,6 +16,12 @@ variable "irsa_policies" {
   default     = []
 }
 
+variable "create_irsa" {
+  description = "Cluster Autoscaler Irsa"
+  type        = bool
+  default     = false
+}
+
 variable "addon_context" {
   description = "Input configuration for the addon"
   type = object({
